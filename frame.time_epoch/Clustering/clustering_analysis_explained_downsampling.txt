@@ -1,0 +1,71 @@
+Clustering-Based Anomaly Detection in PCAP Timing Analysis
+==========================================================
+
+Overview
+--------
+This script uses unsupervised machine learning clustering techniques to analyze the delta times (Δt) between network packets captured in a PCAP file.
+The goal is to group packets with similar arrival intervals and flag timing anomalies that fall outside expected patterns.
+
+What It Analyzes
+----------------
+- The script reads timestamps from the PCAP using TShark (`frame.time_epoch`)
+- Computes the time difference (Δt) between each packet
+- Applies two clustering algorithms:
+  1. DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+  2. KMeans (K-Means Clustering)
+
+Clustering Methods
+------------------
+
+1. DBSCAN
+   - Groups packets based on the density of Δt values
+   - Flags isolated or sparsely distributed Δt values as "noise" (label -1)
+   - Good at identifying anomalous bursts or long silences that deviate from the norm
+
+2. KMeans
+   - Forces all Δt values into a fixed number of clusters (k=2 by default)
+   - Helps visualize how traffic timing is distributed
+   - Less effective at anomaly detection alone, but good for seeing structure
+
+What You See in the Plots
+-------------------------
+- The X-axis shows the index of each packet (arrival order)
+- The Y-axis shows the Δt (time between this packet and the last)
+- Each color represents a cluster
+  - In DBSCAN, the color -1 usually means "anomaly" (noise)
+  - In KMeans, all data is clustered, but you can infer separation between normal/abnormal groups
+
+Interpretation Examples
+-----------------------
+- Packets with extremely small or large Δt values will appear distant from the main cluster
+- A large number of small Δt values tightly grouped may indicate a traffic burst (e.g. DoS attack)
+- Outliers in DBSCAN may suggest stealthy communication or scanning activity
+
+Benefits
+--------
+- No training data required (unsupervised learning)
+- Can discover structure and outliers without assumptions
+- Helpful for identifying timing-based anomalies visually
+
+Limitations
+-----------
+- KMeans requires predefining the number of clusters
+- DBSCAN sensitivity depends on parameter tuning (eps, min_samples)
+- Both methods may miss complex or subtle anomaly patterns
+
+Conclusion
+----------
+This method provides a fast and intuitive way to explore packet timing behavior and visually identify patterns that may indicate abnormal network activity.
+It complements statistical or predictive techniques like ARIMA or Isolation Forest.
+
+Downsampling for Memory Efficiency
+----------------------------------
+Clustering algorithms like DBSCAN can be memory-intensive, especially on large PCAP files with thousands of packets.
+To avoid MemoryErrors during analysis, this version of the script includes a downsampling step:
+
+    df = df.iloc[::10].reset_index(drop=True)
+
+This keeps every 10th packet and discards the rest, significantly reducing memory usage while still preserving the timing structure.
+Downsampling makes it possible to run DBSCAN and KMeans on large datasets without crashing due to memory constraints.
+
+Note: You can adjust the interval (e.g., `::5`, `::20`) to fine-tune the tradeoff between performance and resolution.

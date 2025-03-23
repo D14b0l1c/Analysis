@@ -1,0 +1,55 @@
+Burst & Silence Detection in PCAP Timing Analysis
+=================================================
+
+Overview
+--------
+This script detects "bursts" and "silences" in network packet traffic by analyzing the delta time (Δt) between consecutive packets in a PCAP file.
+It flags very short gaps as "bursts" and very long gaps as "silences," helping identify anomalies like DoS attacks, scanning activity, idle connections, or beaconing.
+
+What It Analyzes
+----------------
+- The script extracts `frame.time_epoch` using TShark
+- Computes the Δt (time between packets)
+- Compares each Δt to two thresholds:
+  - Burst threshold (e.g., 0.001 seconds): packets arriving too close together
+  - Silence threshold (e.g., 1 second): long delays between packets
+
+How It Works
+------------
+1. Δt values are calculated for all packets.
+2. Any Δt < burst_thresh is marked as a "burst"
+3. Any Δt > silence_thresh is marked as a "silence"
+4. These points are visualized in the plot using different colors:
+   - Orange = Burst
+   - Purple = Silence
+
+What the Plot Shows
+-------------------
+- X-axis: Packet index (arrival order)
+- Y-axis: Δt value (in seconds)
+- Line plot of all Δt values
+- Highlighted scatter points:
+  - Orange dots for bursts
+  - Purple dots for silences
+
+Interpretation Examples
+-----------------------
+- A large block of orange points may indicate a traffic spike or DoS event
+- Scattered purple dots could mean keep-alive pings or idle periods
+- Repeating burst/silence patterns might indicate beaconing or scanning activity
+
+Benefits
+--------
+- Simple to understand and fast to compute
+- Useful for identifying temporal outliers and patterns
+- Works well for exploratory traffic analysis
+
+Limitations
+-----------
+- Requires manual threshold tuning depending on traffic type
+- Doesn’t adapt to variable baseline timing
+- May miss more subtle or evolving patterns (use ML for that)
+
+Conclusion
+----------
+This method offers a lightweight and effective way to flag bursts and silences in network traffic. It's great for visual inspection and complements deeper anomaly detection models like ARIMA or Autoencoders.

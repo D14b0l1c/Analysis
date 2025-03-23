@@ -1,0 +1,52 @@
+Sliding Window + One-Class SVM Anomaly Detection in PCAP Timing Analysis
+========================================================================
+
+Overview
+--------
+This method detects anomalous behavior in PCAP traffic using a combination of sliding window feature extraction and One-Class SVM (Support Vector Machine).
+It breaks the packet delta time series into windows and analyzes statistical features of each window to identify unusual patterns.
+
+What It Analyzes
+----------------
+- Extracts packet arrival times from a PCAP using TShark (`frame.time_epoch`)
+- Calculates time deltas (Δt) between each packet
+- Slides a fixed-size window over the Δt series and computes:
+  - Average time gap (mean)
+  - Standard deviation (jitter)
+  - Packet count in the window
+- These features are used as input to One-Class SVM for anomaly detection
+
+How It Works
+------------
+1. A sliding window moves through the Δt values, generating summary statistics per window.
+2. Features are normalized using `StandardScaler`.
+3. One-Class SVM is trained to learn the "normal" region in the feature space.
+4. Windows that fall outside this learned region are flagged as anomalies.
+
+What the Plot Shows
+-------------------
+- X-axis: Index of each window
+- Y-axis: Anomaly score (1 = normal, -1 = anomaly)
+- Shows which windows One-Class SVM considers "unusual"
+
+Interpretation Examples
+-----------------------
+- Sudden changes in average Δt or jitter will appear as spikes
+- Bursts, silences, or timing irregularities grouped within a window can trigger anomalies
+- This is helpful when patterns are consistent over small segments of time but not globally
+
+Benefits
+--------
+- Captures short-term deviations in timing behavior
+- Adaptable via window size and feature selection
+- Works well on semi-structured timing irregularities
+
+Limitations
+-----------
+- Sensitivity depends on window size and SVM parameters
+- May not detect single-packet anomalies
+- Requires some parameter tuning for optimal results
+
+Conclusion
+----------
+Sliding window analysis with One-Class SVM is a flexible technique that provides anomaly detection across time-localized behaviors in network traffic. It balances statistical methods with machine learning and works well in combination with other time-series models.

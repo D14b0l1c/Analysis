@@ -1,0 +1,51 @@
+Autoencoder-Based Anomaly Detection in PCAP Timing Analysis
+===========================================================
+
+Overview
+--------
+This script uses a neural network called an autoencoder to detect timing anomalies in packet capture (PCAP) data.
+The model learns what "normal" inter-packet timing looks like, and then flags packets or sequences that differ significantly from that learned pattern.
+
+What It Analyzes
+----------------
+- The script reads timestamps from the PCAP using TShark (`frame.time_epoch`)
+- Calculates the time delta (Δt) between each packet
+- Creates overlapping sequences of Δt values (like sliding windows)
+- Trains an autoencoder to reconstruct those sequences
+
+How Autoencoder Detection Works
+-------------------------------
+1. An autoencoder is trained on sequences of Δt values.
+2. The network learns to compress (encode) and then rebuild (decode) the input.
+3. If the reconstructed sequence is very different from the original, it's likely an anomaly.
+4. The reconstruction error (difference between original and reconstructed Δt) is measured.
+5. Sequences with high reconstruction error are flagged as anomalous.
+
+What You See in the Plot
+------------------------
+- The X-axis shows the sequence index
+- The Y-axis shows the reconstruction error for that sequence
+- A red dashed line marks the anomaly threshold (mean + 3*std deviation)
+- Red points indicate sequences that the autoencoder struggled to reconstruct accurately — potential anomalies
+
+Interpretation Examples
+-----------------------
+- Bursts of traffic, jitter, or idle periods may create patterns the model didn't learn
+- If a sequence of Δt values doesn't match the normal training data, its error spikes
+- Red dots suggest something abnormal occurred in that time window
+
+Benefits
+--------
+- Learns complex patterns in timing data (non-linear relationships)
+- Good for detecting subtle or rare timing anomalies
+- Does not require labeled anomaly data
+
+Limitations
+-----------
+- Requires more computational power than simpler models
+- May need tuning (sequence length, architecture)
+- Requires `tensorflow` / `keras` installed
+
+Conclusion
+----------
+Autoencoders provide a powerful way to model and detect unusual behavior in packet timing. They're especially useful when timing anomalies are hard to detect using simple thresholds or clustering techniques.

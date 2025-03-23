@@ -1,0 +1,48 @@
+ARIMA Anomaly Detection in PCAP Timing Analysis
+===============================================
+
+What is ARIMA?
+--------------
+ARIMA stands for AutoRegressive Integrated Moving Average. It is a statistical model used for time series forecasting and anomaly detection.
+In the context of PCAP (packet capture) analysis, ARIMA can be used to model the time intervals (Δt) between network packets and detect unexpected timing patterns.
+
+Use Case in Network Analysis
+----------------------------
+We calculate the time delta (Δt) between each packet using the 'frame.time_epoch' field from the PCAP. This gives us a time series of packet arrival intervals.
+ARIMA is then trained on this Δt sequence to predict what the next interval should be based on past behavior.
+
+How Anomalies Are Detected
+--------------------------
+1. ARIMA forecasts what the Δt value "should" be at each point.
+2. The actual Δt is compared to the predicted value.
+3. The difference (called the residual) is calculated: residual = actual - predicted
+4. If the residual is unusually large (beyond 3 standard deviations), the packet is flagged as an anomaly.
+
+What the Results Show
+---------------------
+The plotted results include:
+- A line showing actual Δt values (how long between packets)
+- A line showing ARIMA's forecasted Δt values
+- Red dots indicating where the actual timing deviated significantly from the forecast
+
+These red points can indicate:
+- Sudden bursts (very short gaps)
+- Network delays (long gaps)
+- Malicious or misbehaving traffic patterns
+- Beaconing or periodic behavior changes
+
+Benefits
+--------
+- Works well on sequences with predictable patterns
+- Detects both outliers and shifts in traffic behavior
+- Non-parametric — doesn’t require prior labeling
+
+Limitations
+-----------
+- ARIMA assumes linear relationships and stationarity
+- May miss very subtle anomalies in noisy data
+- Needs careful parameter tuning for best performance
+
+Conclusion
+----------
+Using ARIMA on packet timing provides a statistical way to detect abnormal traffic timing patterns, potentially revealing scans, DoS activity, or malware communication.

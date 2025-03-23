@@ -1,0 +1,53 @@
+Statistical Threshold-Based Anomaly Detection in PCAP Timing Analysis
+======================================================================
+
+Overview
+--------
+This script uses a simple statistical method to detect anomalies in network traffic by analyzing the time delta (Δt) between packets in a PCAP file.
+It identifies values that fall significantly outside the expected timing pattern based on standard deviation from the mean.
+
+What It Analyzes
+----------------
+- Extracts packet arrival timestamps using TShark (`frame.time_epoch`)
+- Calculates Δt = time difference between consecutive packets
+- Computes the statistical mean and standard deviation (std) of the Δt values
+- Flags Δt values outside the range: [mean - 3*std, mean + 3*std] as anomalies
+
+How It Works
+------------
+1. Calculate the average (mean) and standard deviation of all Δt values.
+2. Compute upper and lower thresholds using the formula:
+     - Upper = mean + 3 × std
+     - Lower = mean - 3 × std
+3. Δt values above the upper or below the lower threshold are considered outliers.
+4. These anomalies are visualized in the plot.
+
+What the Plot Shows
+-------------------
+- X-axis: Packet index (arrival order)
+- Y-axis: Δt (time between packets)
+- Solid line = Δt values over time
+- Red dashed lines = threshold boundaries (mean ± 3σ)
+- Red dots = anomalous Δt values outside the normal range
+
+Interpretation Examples
+-----------------------
+- Very short Δt values may indicate a traffic burst or flood
+- Very long Δt values may indicate idle periods or connection stalls
+- This method helps flag packet behavior that deviates sharply from the norm
+
+Benefits
+--------
+- Simple and fast to compute
+- No machine learning or training needed
+- Effective for catching obvious timing outliers
+
+Limitations
+-----------
+- Assumes a normal distribution of Δt values
+- Cannot detect subtle or structured anomalies (e.g., periodic spikes, jitter)
+- Not adaptive to changes in baseline traffic behavior
+
+Conclusion
+----------
+This threshold-based approach provides a quick and effective baseline for identifying extreme timing anomalies in packet traffic. It works best as a first-pass filter before applying more complex models like ARIMA or Autoencoders.
