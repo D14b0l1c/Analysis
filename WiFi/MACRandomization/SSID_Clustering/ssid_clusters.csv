@@ -1,0 +1,16 @@
+mac,ssids,cluster
+02:c7:d5:a3:43:91,{'HomeWiFi'},0
+02:6e:8b:a2:78:57,"{'HomeWiFi', 'Eduroam'}",0
+02:7e:ad:54:48:72,{'iPhoneNet'},0
+02:7d:cd:30:77:43,{'Eduroam'},0
+02:22:a6:af:39:c4,"{'HomeWiFi', 'iPhoneNet'}",0
+02:df:12:bd:0d:4b,"{'AndroidAuto', 'Eduroam'}",0
+02:5b:cd:b1:67:e4,{'Eduroam'},0
+02:3a:bf:d2:47:ff,{'Eduroam'},0
+02:d1:07:ef:43:24,"{'HomeWiFi', 'AndroidAuto', 'iPhoneNet'}",0
+02:54:d1:48:d6:fd,"{'HomeWiFi', 'StarbucksWiFi', 'AndroidAuto'}",0
+02:65:ad:e5:32:2d,{'Eduroam'},0
+02:19:bc:b5:b3:5d,"{'HomeWiFi', 'StarbucksWiFi', 'AndroidAuto', 'iPhoneNet'}",0
+02:4e:ca:1e:36:42,"{'StarbucksWiFi', 'AndroidAuto', 'Eduroam'}",0
+02:86:71:57:ae:5a,"{'Eduroam', 'StarbucksWiFi', 'iPhoneNet'}",0
+02:27:dd:52:56:6e,"{'HomeWiFi', 'iPhoneNet', 'Eduroam'}",0
