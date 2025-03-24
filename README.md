@@ -1,4 +1,4 @@
-# Network Anomaly Detection Analysis
+# Network Anomaly & Detection Analysis
 
 This repository contains modular tools for analyzing network anomalies from packet capture (PCAP) files. It is divided into two primary domains:
 
