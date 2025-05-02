@@ -32,6 +32,7 @@ Located in: [`WiFi/`](./WiFi)
 | `EvilTwinDetection`          | Identifies multiple BSSIDs broadcasting the same SSID                   |
 | `RogueAPDetection`           | Detects unauthorized access points not in a known whitelist             |
 | `MACRandomization`           | Analyzes MAC randomization behavior through submodules                  |
+| `pyvip/`                     | pyVIP-compatible scripts to visualize detection outputs in Explore      |
 
 Sample PCAPs for these modules can be found in:
 
