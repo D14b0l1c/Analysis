@@ -1,70 +1,115 @@
-# Fingerprint-Based Clustering of Probe Requests
+# Wi-Fi Fingerprint Clustering (Full TShark Extraction)
 
-This script clusters probe requests by hashing their 802.11 Information Elements (IEs). Devices using randomized MAC addresses often still include consistent tag sets in their probe requests, making it possible to fingerprint and group them.
+This module clusters devices based on full Wi-Fi frame fingerprinting, using **TShark** to extract Management, Control, and Data frame information, including Radiotap, Vendor, Prism, and AVS headers.
+
+---
+
+## Project Structure
+
+| File | Purpose |
+|:-----|:--------|
+| `tshark_Fingerprint_Clustering.py` | Main script: TShark-based fingerprint clustering. |
+| `Fingerprint_Clustering.py` | (Legacy) Older basic fingerprint version (optional). |
+| `fingerprint_clusters.csv` | Output file containing clustered devices. |
+| `README.md` | Documentation (this file). |
 
 ---
 
 ## Purpose
 
-To identify likely device sessions in the presence of MAC randomization by comparing the tag-level content of probe requests.
+This script allows robust clustering and identification of wireless devices —  
+even when MAC address randomization is enabled — by using detailed hardware, capability, and radio fingerprinting features.
+
+- MAC Addresses (Source, Destination, BSSID, Transmitter, Receiver)
+- Supported Rates, Extended Rates
+- HT (802.11n), VHT (802.11ac), HE (802.11ax) Capabilities
+- RSN and WPA Security Configurations
+- Vendor-Specific Information
+- Radio Measurements (RCPI, RSNI, Measurement Types)
+- Physical Layer Information (MCS, NSS, Antenna Signal/Noise)
+- Prism and AVS header fields (for specialized captures)
 
 ---
 
 ## Requirements
 
-- Python 3.x  
-- Scapy  
-- pandas
+- Python 3.8+
+- TShark installed (`tshark` in system PATH)
+- Python libraries:
+  - pandas
+  - scikit-learn
 
 Install dependencies:
 
 ```bash
-pip install scapy pandas
+pip install pandas scikit-learn
+```
+
+Install TShark:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install tshark
+
+# MacOS (Homebrew)
+brew install wireshark
 ```
 
 ---
 
-## Input
+## How to Run
 
-- PCAP file containing probe requests  
-  **Expected path:**  
-  `WiFiProbeRequestsPCAP/probe_requests.pcap`
-
-Update this path in the script if needed:
-
-```python
-PCAP_FILE = "WiFiProbeRequestsPCAP/probe_requests.pcap"
+```bash
+python tshark_Fingerprint_Clustering.py <input_file.pcap>
 ```
 
----
+Example:
 
-## How It Works
+```bash
+python tshark_Fingerprint_Clustering.py example_capture.pcap
+```
 
-1. Loads probe request frames using Scapy.
-2. Extracts and hashes all `Dot11Elt` (tag) contents to generate a fingerprint.
-3. Groups MAC addresses that share the same tag fingerprint.
-4. Exports results to a CSV file.
+This will:
+- Extract all critical Wi-Fi fields
+- Build fingerprints
+- Cluster devices
+- Output to `fingerprint_clusters.csv`
 
 ---
 
 ## Output
 
-- `fingerprint_clusters.csv`:  
-  Each row contains:
-  - Fingerprint hash
-  - List of source MACs using it
+The resulting CSV (`fingerprint_clusters.csv`) contains:
 
-Console output summarizes:
+| Field | Description |
+|:------|:------------|
+| mac | Device MAC address (if available) |
+| fingerprint | MD5 hash of all extracted capabilities |
+| cluster | Cluster label assigned by DBSCAN |
 
-```
-Fingerprint clustering complete.
-Fingerprint ab12cd34... → MACs: [aa:bb:cc:dd:ee:ff, 11:22:33:44:55:66]
-```
+Example:
+
+| mac | fingerprint | cluster |
+|:---|:------------|:--------|
+| aa:bb:cc:dd:ee:ff | d41d8cd98f00b204e9800998ecf8427e | 0 |
+| 11:22:33:44:55:66 | 0cc175b9c0f1b6a831c399e269772661 | 1 |
+
+---
+
+## Features Extracted
+
+- Full 802.11 Management/Control/Data header fields
+- Extended Vendor Tags and Custom IEs
+- RSN (WPA2/WPA3) Security Parameters
+- HT/VHT/HE Capabilities
+- Radiotap Signal Strengths, Antennas, Channel Info
+- Prism and AVS Header Data (if present)
 
 ---
 
 ## Notes
 
-- This method ignores SSID content and timing — it clusters purely by tag similarity.
-- Tag sets are vendor-influenced and can be stable even when MACs rotate.
-- Ideal for probe-level privacy analysis and identifying persistent scanning behavior.
+- No frame-type filter applied: captures **all** Wi-Fi frames.
+- Designed for high-fidelity clustering in dense wireless environments.
+- Works across Wi-Fi 4/5/6 clients and IoT devices.
+- Resilient to MAC address randomization techniques.

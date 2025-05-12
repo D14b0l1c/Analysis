@@ -1,79 +1,113 @@
-# Temporal Clustering of Probe Requests
+# Temporal Clustering of Wi-Fi Devices (TShark Version)
 
-This module clusters MAC addresses based on the timing and sequence behavior of their probe requests. Even when MAC addresses are randomized, devices often reveal consistency in how frequently they send probes and how sequence numbers change. These patterns can be used to infer repeated device behavior.
+This module clusters devices based on the timing behavior of their Wi-Fi frames, using timestamps and appearance patterns extracted directly via **TShark**.  
+Even under MAC randomization, timing consistency can reveal persistent devices.
+
+---
+
+## Project Structure
+
+| File | Purpose |
+|:-----|:--------|
+| `tshark_Temporal_Clustering.py` | Main script: TShark-based temporal clustering. |
+| `Temporal_Clustering.py` | (Legacy) Scapy-based temporal clustering version (optional). |
+| `temporal_clusters.csv` | Output file containing clustered devices. |
+| `README.md` | Documentation (this file). |
 
 ---
 
 ## Purpose
 
-To identify groups of randomized MAC addresses that share similar timing intervals and 802.11 sequence behavior, potentially indicating a single physical device rotating its identity.
+Identify devices that behave similarly over time, based on:
+- Inter-arrival timing of frames
+- Total session duration
+- Frame transmission frequency
+
+Temporal fingerprints are resilient against MAC randomization and are critical for wireless surveillance, IoT tracking, and behavioral analysis.
 
 ---
 
 ## Requirements
 
-- Python 3.x  
-- Scapy  
-- pandas  
-- numpy  
-- scikit-learn
+- Python 3.x
+- TShark installed (must be in system PATH)
+- Python libraries:
+  - pandas
+  - numpy
+  - scikit-learn
 
-Install dependencies:
+Install Python dependencies:
 
 ```bash
-pip install scapy pandas numpy scikit-learn
+pip install pandas numpy scikit-learn
+```
+
+Install TShark:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install tshark
+
+# MacOS (Homebrew)
+brew install wireshark
 ```
 
 ---
 
-## Input
+## How to Run
 
-- PCAP file containing 802.11 probe requests  
-  **Expected path:**  
-  `WiFiProbeRequestsPCAP/probe_requests.pcap`
-
-Update the path if needed:
-
-```python
-PCAP_FILE = "WiFiProbeRequestsPCAP/probe_requests.pcap"
+```bash
+python tshark_Temporal_Clustering.py <input_file.pcap>
 ```
 
----
+Example:
 
-## How It Works
+```bash
+python tshark_Temporal_Clustering.py capture.pcap
+```
 
-1. Parses probe request frames using Scapy.
-2. For each MAC address:
-   - Records timestamps and 802.11 sequence numbers
-   - Calculates:
-     - Mean and standard deviation of time deltas (Δt)
-     - Mean and standard deviation of sequence number deltas
-3. Builds a feature set with these metrics.
-4. Applies DBSCAN clustering on the feature vectors.
-5. Outputs clusters of MACs with similar temporal behavior.
+This will:
+- Extract timestamps and MAC addresses from all frames.
+- Build timing profiles per device.
+- Cluster devices based on their temporal characteristics.
+- Output to `temporal_clusters.csv`.
 
 ---
 
 ## Output
 
-- `temporal_clusters.csv`  
-  Contains:
-  - MAC address
-  - Mean and standard deviation of Δt
-  - Mean and standard deviation of sequence deltas
-  - Assigned cluster label
+The resulting CSV (`temporal_clusters.csv`) contains:
 
-Console output example:
+| Field | Description |
+|:------|:------------|
+| mac | Device MAC address |
+| mean_gap | Mean inter-arrival time (seconds) |
+| std_gap | Standard deviation of inter-arrival times |
+| total_time | Total observed session time (seconds) |
+| frame_count | Total number of frames seen |
+| cluster | Cluster ID assigned by DBSCAN |
 
-```
-Temporal clustering done using Scapy. Fields used: timestamp deltas and sequence deltas
-Cluster 0: ['aa:bb:cc:dd:ee:ff', '11:22:33:44:55:66']
-```
+Example:
+
+| mac | mean_gap | std_gap | total_time | frame_count | cluster |
+|:---|:---------|:--------|:-----------|:------------|:--------|
+| aa:bb:cc:dd:ee:ff | 0.2 | 0.05 | 20.4 | 100 | 0 |
+| 11:22:33:44:55:66 | 0.25 | 0.07 | 18.9 | 85 | 1 |
+
+---
+
+## Extracted Fields
+
+- `wlan.sa` — Source MAC Address
+- `frame.time_epoch` — Packet timestamp
+
+(Optionally expandable with `radiotap.dbm_antsignal`, `radiotap.antenna` for signal-based enrichment.)
 
 ---
 
 ## Notes
 
-- This method is most effective when multiple probe requests from each MAC are present in the capture.
-- Useful for identifying session reuse patterns and potential MAC rotation intervals.
-- Best used in conjunction with SSID and tag-based clustering for multi-dimensional correlation.
+- Works across all Wi-Fi frame types (Management, Control, Data).
+- Extremely effective in environments with MAC address randomization.
+- Best results when used alongside Fingerprint and SSID Clustering modules.
+- Useful for forensic reconstructions, persistence analysis, and mobility studies.
