@@ -1,4 +1,3 @@
-
 # Analysis
 
 This repository contains modular tools for analyzing network anomalies from packet capture (PCAP) files. It covers three primary domains:
@@ -6,6 +5,7 @@ This repository contains modular tools for analyzing network anomalies from pack
 - **Wi-Fi** anomaly detection (802.11)
 - **Ethernet** timing analysis using `frame.time_epoch`
 - **Vulnerability** detection and analysis
+- **Bluetooth** passive device classification and behavioral fingerprinting
 
 Each technique is implemented in Python, with modular scripts and reproducible outputs.
 
@@ -18,6 +18,7 @@ Each technique is implemented in Python, with modular scripts and reproducible o
 | `WiFi/`               | Tools for analyzing 802.11 wireless traffic for attacks and behavioral leaks|
 | `frame.time_epoch/`   | Timing-based anomaly detection in Ethernet PCAPs using statistical and ML techniques|
 | `Vulnerability/`      | Tools for identifying and analyzing network vulnerabilities using scan data and exploit databases|
+| `Bluetooth/`          | Scripts for classifying and visualizing Bluetooth device behaviors using Kismet logs and pyVIP|
 
 ---
 
@@ -38,6 +39,31 @@ Sample PCAPs for these modules can be found in:
 
 - `WiFiAnomaliesPCAP/`
 - `WiFiProbeRequestsPCAP/`
+
+---
+
+## Bluetooth Analysis Modules
+
+Located in: [`Bluetooth/`](./Bluetooth)
+
+This module analyzes Bluetooth Classic and BLE data from `.kismet` logs to extract passive device insights and behavioral patterns. Outputs include CSVs, KML maps, and pyVIP-compatible visualizations.
+
+| Component                    | Description                                                              |
+|------------------------------|--------------------------------------------------------------------------|
+| `bluetooth.py`               | Main extraction and classification engine for Kismet `.kismet` files     |
+| `pyvip_behavior/`            | pyVIP scripts for each behavior class (advertisers, scanners, etc.)      |
+| `kismet_output/`             | Folder for CSV exports, plots, and KML maps                              |
+
+### Classifications:
+- Advertisers
+- Persistent devices
+- Repetitive advertisers
+- Rich vs. no-service profiles
+- Rotating MACs
+- Signal strength anomalies
+- Scanners
+
+Behavioral classifications are based on signal patterns, observed services, presence duration, and vendor prefix clustering.
 
 ---
 
@@ -79,9 +105,11 @@ This module integrates network vulnerability detection and analysis, combining s
 - Python 3.x
 - TShark (Wireshark CLI) for timestamp extraction
 - Python libraries (varies per module):
-  ```
-  scapy, pandas, numpy, matplotlib, scikit-learn, statsmodels, tensorflow, keras
-  ```
+```
+
+scapy, pandas, numpy, matplotlib, scikit-learn, statsmodels, tensorflow, keras
+
+```
 
 ---
 
@@ -92,17 +120,6 @@ This module integrates network vulnerability detection and analysis, combining s
 - Behavioral fingerprinting of probe activity
 - Time-based Ethernet traffic anomaly analysis
 - Clustering and modeling device behavior across sessions
+- Bluetooth presence mapping, MAC analysis, vendor distribution
 - Vulnerability detection, prioritization, and exploitability assessment
 - pyVIP visualizations of risk surfaces and exploit distributions
-
----
-
-## License
-
-This repository is intended for research, academic, and authorized security auditing use. Please use responsibly.
-
----
-
-## Author
-
-Maintained by [D14b01c](https://github.com/D14b01c)
