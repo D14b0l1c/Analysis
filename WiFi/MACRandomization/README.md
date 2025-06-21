@@ -72,7 +72,7 @@ Each script generates a plot or summary report highlighting clusters or suspecte
 Refer to the included PDF for detailed background:
 
 ```
-Exploration of User Privacy in 802.11 Probe Requests with MAC Address Randomization Under Clustering Attacks.pdf
+Exploration of User Privacy in 802.11 Probe Requests with MAC Address Randomization Using Temporal Pattern Analysis.pdf
 ```
 
 This paper outlines the threat model, assumptions, clustering heuristics, and limitations.
